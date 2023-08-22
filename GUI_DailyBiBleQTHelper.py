@@ -9,6 +9,40 @@ import traceback
 import random
 import os
 import requests
+from tkinter import ttk as tk_combo
+from tkinter import font
+
+
+##### ------------------------- next update : astract ------------------------- #####
+
+
+class Theme:
+	colors = [] ## different color including: 'BibleContent', 'BibleTitle', 'div', 'button', ...
+	def __init__(color_panel):
+		self.colors = color_panel
+
+
+## user preference
+global_file_name = 'appearance.config'
+default_font_size = 12
+default_font = 'TkDefaultFont'
+default_theme = 'Deafult'
+if os.path.exists(global_file_name):
+	with open(global_file_name, 'r') as file:
+		content = file.read()
+		arr = [c.split('=')[-1] for c in content.split('\n')]
+		default_font_size = int(arr[0]) if arr[0]!='' else default_font_size
+		default_font = arr[1] if arr[1]!='' else default_font
+		default_theme = arr[2] if arr[2]!='' else default_theme
+else:
+	with open(global_file_name, 'w') as file:
+		file.writelines('default_font_size=\n')
+		file.writelines('default_font=\n')
+		file.writelines('default_theme=\n')
+
+
+
+##### ------------------------- next update ------------------------- #####
 
 ## func
 def define_layout(obj, cols=1, rows=1):
@@ -17,7 +51,7 @@ def define_layout(obj, cols=1, rows=1):
 			trg.columnconfigure(c, weight=1)
 		for r in range(rows):
 			trg.rowconfigure(r, weight=1)
-	if type(obj)==list:        
+	if type(obj)==list:
 		[ method(trg, cols, rows) for trg in obj ]
 	else:
 		trg = obj
@@ -35,17 +69,17 @@ def hcf(num1, num2):
 	return ans
 
 def displayScript(title, data):
-	global global_quote_text
+	global BibleTitle_Text
 	global global_is_editable
 
 	if not global_is_editable.get():
 		if title!=None:
-			global_quote_text.set(title)
-		textbox1.config(state='normal')
-		textbox1.delete(1.0, tk.END)
-		textbox1.insert(tk.INSERT, '\n'.join(data))
+			BibleTitle_Text.set(title)
+		BibleContent_Text.config(state='normal')
+		BibleContent_Text.delete(1.0, tk.END)
+		BibleContent_Text.insert(tk.INSERT, '\n'.join(data))
 		# global_word_content.set('\n'.join(data))
-		textbox1.config(state='disabled')
+		BibleContent_Text.config(state='disabled')
 
 
 ## controler
@@ -55,9 +89,9 @@ def TextBoxStatusChanging(global_is_editable):
 	if global_debug_mode:
 		print('可編輯' if global_is_editable.get() else '不可編輯')
 	if global_is_editable.get():
-		textbox1.config(state='normal')
+		BibleContent_Text.config(state='normal')
 	else:
-		textbox1.config(state='disabled')
+		BibleContent_Text.config(state='disabled')
 def List1_Select(event):
 	global global__list_text1
 	global global__chapter_num_choice
@@ -142,21 +176,27 @@ def List2_Select(event):
 		if global_debug_mode:
 			print('Item Selection = [%d]' % global__list_text3)
 		global__verse_num_choice = [i+1 for i in range(len(global_cur_script[1]))]
+		## no changes
 		global__verse_num_choice_S = global__verse_num_choice_E = global__verse_num_choice
-		verse_num__LP3.delete(0, "end")
-		verse_num__LP4.delete(0, "end")
-		for i in global__verse_num_choice:
-			verse_num__LP3.insert("end", i)
-			verse_num__LP4.insert("end", i)
+		# verse_num__LP3.delete(0, "end")
+		# verse_num__LP4.delete(0, "end")
+		# for i in global__verse_num_choice:
+		# 	verse_num__LP3.insert("end", i)
+		# 	verse_num__LP4.insert("end", i)
+		## new edit
+		verse_num__Com3["values"] = global__verse_num_choice_S
+		verse_num__Com3.set("Select Start Verse")
+		verse_num__Com4["values"] = global__verse_num_choice_E
+		verse_num__Com4.set("Select End Verse")
 	except:
 		print('', end='')
 		return ;
 
-	# global global_quote_text
-	# global_quote_text = global__list_text1+' 第'+str(global__list_text2)+'章'
+	# global BibleTitle_Text
+	# BibleTitle_Text = global__list_text1+' 第'+str(global__list_text2)+'章'
 	# cn_box.delete(0, 'end')
-	# cn_box.insert('end', global_quote_text)
-	# lbl_quote.text = global_quote_text
+	# cn_box.insert('end', BibleTitle_Text)
+	# lbl_quote.text = BibleTitle_Text
 def List3_Select(event):
 	global global__list_text3
 	global global_debug_mode
@@ -227,6 +267,96 @@ def List4_Select(event):
 	except:
 		print('', end='')
 		return ;
+
+## new edit
+def Verse_Combo3(event):
+	selected_item = verse_num__Com3.get()
+	print("Selected:", selected_item)
+def Verse_Combo4(event):
+	selected_item = verse_num__Com4.get()
+	print("Selected:", selected_item)
+font_array_index = 0
+font_array = [12, 14, 16, 18, 20]
+default_font = "TkDefaultFont"
+def BibleContent__font_size_increase():
+	global font_array_index
+	global font_array
+	global default_font
+	tmp_font_array_index = font_array_index + 1
+	if tmp_font_array_index>=len(font_array):
+		result = tkm.askyesno("提示~", "字體最大 = %d"%font_array[font_array_index])
+		font_array_index = len(font_array) - 1
+	else:
+		font_array_index = tmp_font_array_index
+	print('Change Text Font-Size To %d' % font_array[font_array_index])
+	font_style = (default_font, font_array[font_array_index])
+	BibleContent_Text.tag_configure("custom_font", font=font_style)
+	BibleContent_Text.tag_add("custom_font", "1.0", tk.END)
+def BibleContent__font_size_decrease():
+	global font_array_index
+	global font_array
+	global default_font
+	tmp_font_array_index = font_array_index - 1
+	if tmp_font_array_index<0:
+		result = tkm.askyesno("提示~", "字體最小 = %d"%font_array[font_array_index])
+		font_array_index = 0
+	else:
+		font_array_index = tmp_font_array_index
+	print('Change Text Font-Size To %d' % font_array[font_array_index])
+	font_style = (default_font, font_array[font_array_index])
+	BibleContent_Text.tag_configure("custom_font", font=font_style)
+	BibleContent_Text.tag_add("custom_font", "1.0", tk.END)
+Title__font_array_index = 0
+Title__font_array = [16, 18, 20, 22, 24, 26, 28, 30, 32]
+def BibleTitle__font_size_increase():
+	global default_font
+	global Title__font_array_index
+	global Title__font_array
+	tmp_font_array_index = Title__font_array_index + 1
+	if tmp_font_array_index>=len(Title__font_array):
+		result = tkm.askyesno("提示~", "字體最大 = %d"%Title__font_array[Title__font_array_index])
+		Title__font_array_index = len(Title__font_array) - 1
+	else:
+		Title__font_array_index = tmp_font_array_index
+	print('Change Title Text Font-Size To %d' % Title__font_array[Title__font_array_index])
+	lbl_quote.config(font=(default_font, Title__font_array[Title__font_array_index]))
+def BibleTitle__font_size_decrease():
+	global default_font
+	global Title__font_array_index
+	global Title__font_array
+	tmp_font_array_index = Title__font_array_index - 1
+	if tmp_font_array_index<0:
+		result = tkm.askyesno("提示~", "字體最小 = %d"%Title__font_array[Title__font_array_index])
+		Title__font_array_index = 0
+	else:
+		Title__font_array_index = tmp_font_array_index
+	print('Change Title Text Font-Size To %d' % Title__font_array[Title__font_array_index])
+	lbl_quote.config(font=(default_font, Title__font_array[Title__font_array_index]))
+def checkFontusale(arr):
+	arr_ = []
+	for font_name in arr:
+		try:
+			tk_font = font.Font(font=font_name)
+			arr_.append(font_name)
+		except tk.TclError:
+			print('', end='')
+	return arr_
+def ChangeFont(event):
+	global font_array_index
+	global font_array
+	global default_font
+	tmp_default_font = newFont__Com.get()
+	if tmp_default_font:
+		default_font = tmp_default_font
+		print('Change Text Font To %r' % newFont__Com.get())
+		font_style = (default_font, font_array[font_array_index])
+		BibleContent_Text.tag_configure("custom_font", font=font_style)
+		BibleContent_Text.tag_add("custom_font", "1.0", tk.END)
+		lbl_quote.config(font=(default_font, Title__font_array[Title__font_array_index]))
+def ChangeTheme(event):
+	tmp_default_font = newTheme__Com.get()
+	## change color ##
+
 
 def record_update(mode, data):
 	global global_record_directory
@@ -629,7 +759,7 @@ global__list_text2 = ''
 global__list_text3 = ''
 global__list_text4 = ''
 global_cur_script = [] ## [title<str>, data<arr>]
-global_quote_text = tk.StringVar()
+BibleTitle_Text = tk.StringVar()
 
 b_options_update = False
 option_menu_options = ["#0 - 取得今日隨機經文"] # + options_update(b_options_update) ## failed to load in the init
@@ -654,6 +784,7 @@ div1 = tk.Frame(window,  width=div_size , height=div_size , bg='blue')
 div2 = tk.Frame(window,  width=div_size , height=div_size , bg='yellow')
 div3 = tk.Frame(window,  width=div_size , height=div_size , bg='green')
 div4 = tk.Frame(window,  width=div_size , height=div_size , bg='purple')
+div1_toolpack = tk.Frame(div1,  width=div_size , height=div_size , bg='gray')
 
 window.update()
 win_size = min( window.winfo_width(), window.winfo_height())
@@ -663,9 +794,24 @@ div1.grid(column=0, row=0, padx=pad, pady=pad, rowspan=2, sticky=align_mode)
 div2.grid(column=1, row=0, padx=pad, pady=pad, sticky=align_mode)
 div3.grid(column=1, row=1, padx=pad, pady=pad, sticky=align_mode)
 div4.grid(column=0, row=2, padx=pad, pady=pad, columnspan=2, sticky=align_mode)
+div1_toolpack.grid(column=2, row=2, padx=pad, pady=pad, columnspan=2, sticky=align_mode)
 
 define_layout(window, cols=2, rows=2)
-define_layout([div1, div2, div3, div4])
+define_layout([div1, div2, div3, div4, div1_toolpack])
+
+## new add
+window.columnconfigure(0, weight=70)
+window.columnconfigure(1, weight=80)
+window.columnconfigure(2, weight=0)
+window.columnconfigure(3, weight=0)
+# window.rowconfigure(2, weight=10)
+# window.rowconfigure(3, weight=1)
+# window.columnconfigure(0, weight=4)
+# window.columnconfigure(1, weight=2)
+# window.columnconfigure(2, weight=1)
+# window.columnconfigure(3, weight=1)
+# window.columnconfigure(4, weight=0)
+
 
 ## items
 # im = Image.open('pic.png')
@@ -679,7 +825,7 @@ define_layout([div1, div2, div3, div4])
 
 # lbl_title1 = tk.Label(div2, text='Hello', bg='orange', fg='white')
 # lbl_title2 = tk.Label(div2, text="World", bg='orange', fg='white')
-lbl_quote = tk.Label(div4, textvariable=global_quote_text, bg='#E7A10A', fg='#70FA0A', font=("微軟黑正體", 14, "bold"))
+lbl_quote = tk.Label(div4, textvariable=BibleTitle_Text, bg='#E7A10A', fg='#70FA0A', font=("微軟黑正體", 14, "bold"))
 lbl_random_title = tk.Label(div3, text="每日經文", bg='green', fg='white', font=("微軟黑正體", 10, "italic underline"))  # "bold italic underline overstrike"
 previous_script = tk.Button(div4, text='Previous Script', bg='blue', fg='white', command=lambda: switch_script('previous'))
 next_script = tk.Button(div4, text='Next Script', bg='blue', fg='white', command=lambda: switch_script('next'))
@@ -704,13 +850,13 @@ next_script.grid(column=2, row=0, sticky=align_mode)
 checkbox1 = tk.Checkbutton(div4, text="Edit Text", variable=global_is_editable)
 checkbox1.grid(column=4, row=0, sticky=align_mode)
 
-textbox1 = tk.Text(div4, font=("Times New Roman", 12), wrap='word')
-textbox1_scrollbar = tk.Scrollbar(div4)
+BibleContent_Text = tk.Text(div4, font=("Times New Roman", font_array[font_array_index]), wrap='word')
+BibleContent_Text_scrollbar = tk.Scrollbar(div4)
 
-textbox1.config(yscrollcommand=textbox1_scrollbar.set) ## 設定讀條(scrolling-bar)調比例與內容相同
-textbox1_scrollbar.config(command=textbox1.yview) ## 設定讀條(scrolling-bar)可以做用在textbox上
-textbox1.grid(column=0, row=1, columnspan=4, sticky=align_mode)
-textbox1_scrollbar.grid(column=4, row=1, columnspan=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+BibleContent_Text.config(yscrollcommand=BibleContent_Text_scrollbar.set) ## 設定讀條(scrolling-bar)調比例與內容相同
+BibleContent_Text_scrollbar.config(command=BibleContent_Text.yview) ## 設定讀條(scrolling-bar)可以做用在textbox上
+BibleContent_Text.grid(column=0, row=1, columnspan=4, sticky=align_mode)
+BibleContent_Text_scrollbar.grid(column=4, row=1, columnspan=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
 
 select_list1 = tk.OptionMenu(div3, option_menu_item_list_var, *option_menu_options, command=lambda x: RandomChapterSelection(option_menu_item_list_var.get()))
 select_list1.grid(column=0, row=2, columnspan=2, sticky=align_mode)
@@ -725,24 +871,87 @@ select_list1.grid(column=0, row=2, columnspan=2, sticky=align_mode)
 bookname_choices = [name.bookname for name in BDR.list_]
 bookname__LP1 = tk.Listbox(div1, listvariable=tk.StringVar(value=bookname_choices))
 bookname__LP1.grid(row=1, column=0, rowspan=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
-
 global__chapter_num_choice = [-1]
 chapter_num__LP2 = tk.Listbox(div1, listvariable=tk.StringVar(value=global__chapter_num_choice))
 chapter_num__LP2.grid(row=1, column=1, rowspan=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+
+## newly edit
+# Create a Combobox widget
+# verse_num__Com3 = tk_combo.Combobox(div1, values=["Item 1", "Item 2", "Item 3", "Item 4", "Item 5"])
 global__verse_num_choice_S = [-1]
-verse_num__LP3 = tk.Listbox(div1, listvariable=tk.StringVar(value=global__verse_num_choice_S))
-verse_num__LP3.grid(row=1, column=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+verse_num__Com3 = tk.ttk.Combobox(div1, values=global__verse_num_choice_S)
+verse_num__Com3.grid(row=1, column=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+# Set an initial value
+verse_num__Com3.set("Select Start Verse")
+
+# verse_num__Com4 = tk_combo.Combobox(div1, values=["Item 1", "Item 2", "Item 3", "Item 4", "Item 5"])
 global__verse_num_choice_E = [-1]
-verse_num__LP4 = tk.Listbox(div1, listvariable=tk.StringVar(value=global__verse_num_choice_E))
-verse_num__LP4.grid(row=2, column=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+verse_num__Com4 = tk.ttk.Combobox(div1, values=global__verse_num_choice_E)
+# verse_num__Com4.grid(row=2, column=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+verse_num__Com4.grid(row=1, column=3, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+verse_num__Com4.set("Select End Verse")
+
+# global__verse_num_choice_S = [-1]
+# verse_num__LP3 = tk.Listbox(div1, listvariable=tk.StringVar(value=global__verse_num_choice_S))
+# verse_num__LP3.grid(row=1, column=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+# global__verse_num_choice_E = [-1]
+# verse_num__LP4 = tk.Listbox(div1, listvariable=tk.StringVar(value=global__verse_num_choice_E))
+# verse_num__LP4.grid(row=2, column=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+
+
+## add new button with different function
+style = tk.ttk.Style()
+## Define a custom style
+style.configure("Square.TButton", font=("Arial", 16), width=5, height=5)
+BibleTitle__fontsize_add_button = tk.ttk.Button(div1_toolpack, text="+", style="Square.TButton", command=BibleTitle__font_size_increase)
+BibleTitle__fontsize_add_button.grid(row=1, column=1, ipadx=int(pad/2), padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+BibleTitle__fontsize_minus_button = tk.ttk.Button(div1_toolpack, text="-", style="Square.TButton", command=BibleTitle__font_size_decrease)
+BibleTitle__fontsize_minus_button.grid(row=1, column=2, ipadx=int(pad/2), padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+
+
+BibleContent__fontsize_add_button = tk.ttk.Button(div1_toolpack, text="+", style="Square.TButton", command=BibleContent__font_size_increase)
+BibleContent__fontsize_add_button.grid(row=2, column=1, ipadx=int(pad/2), padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+BibleContent__fontsize_minus_button = tk.ttk.Button(div1_toolpack, text="-", style="Square.TButton", command=BibleContent__font_size_decrease)
+BibleContent__fontsize_minus_button.grid(row=2, column=2, ipadx=int(pad/2), padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+
+global_font_usable = checkFontusale([
+	'Arial', 
+	'Times New Roman', 
+	'Calibri', 
+	'Segoe UI', 
+	'Verdana', 
+	'SimSun', 
+	'Microsoft YaHei', 
+	'KaiTi', 
+	'FangSong', 
+	'SimHei', 
+	'NSimSun', 
+	'WenQuanYi Zen Hei', 
+	'Noto Sans CJK', 
+	'AR PL ZenKai Uni', 
+	'AR PL KaitiM Uni', 
+	'Droid Sans Fallback'
+])
+newFont__Com = tk.ttk.Combobox(div1_toolpack, width=10, height=5, values=global_font_usable)
+newFont__Com.grid(row=1, column=3, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+newFont__Com.set("可用字體") # (若為空白，則不支援其他預設)")
+
+global_theme = ['Default']
+newTheme__Com = tk.ttk.Combobox(div1_toolpack, width=10, height=5, values=global_theme)
+newTheme__Com.grid(row=1, column=4, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+newTheme__Com.set("選用顏色主題")
+
+
+
 div1.rowconfigure(0, weight=1)
-div1.rowconfigure(1, weight=1)
-div1.rowconfigure(2, weight=1)
-div1.rowconfigure(3, weight=0)
-div1.columnconfigure(0, weight=0)
-div1.columnconfigure(1, weight=0)
-div1.columnconfigure(2, weight=2)
-div1.columnconfigure(3, weight=0)
+div1.rowconfigure(1, weight=5)
+div1.rowconfigure(2, weight=15)
+div1.rowconfigure(3, weight=1)
+div1.columnconfigure(0, weight=8)
+div1.columnconfigure(1, weight=4)
+div1.columnconfigure(2, weight=1)
+div1.columnconfigure(3, weight=1)
+div1.columnconfigure(4, weight=0)
 
 div3.rowconfigure(0, weight=0)
 div3.rowconfigure(1, weight=0)
@@ -757,9 +966,19 @@ div4.columnconfigure(2, weight=1)
 div4.columnconfigure(3, weight=0)
 div4.columnconfigure(4, weight=0)
 
+div1_toolpack.rowconfigure(0, weight=0)
+div1_toolpack.rowconfigure(1, weight=1)
+div1_toolpack.rowconfigure(2, weight=1)
+div1_toolpack.rowconfigure(3, weight=0)
+div1_toolpack.columnconfigure(0, weight=0)
+div1_toolpack.columnconfigure(1, weight=1)
+div1_toolpack.columnconfigure(2, weight=1)
+div1_toolpack.columnconfigure(3, weight=4)
+div1_toolpack.columnconfigure(4, weight=4)
+div1_toolpack.columnconfigure(5, weight=0)
 
 ## usage
-global_quote_text.set("[ 聖經查找 ]")
+BibleTitle_Text.set("[ 聖經查找 ]")
 # bt1['command'] = lambda : get_size(window, image_main, im)
 checkbox1['command'] = lambda: TextBoxStatusChanging(global_is_editable)
 # select_list1['command'] = lambda: selection(var.get())
@@ -767,8 +986,16 @@ checkbox1['command'] = lambda: TextBoxStatusChanging(global_is_editable)
 # listbox2.bind('<<ListboxSelect>>', lambda event: ChapterSelection2(2, event.widget.get(event.widget.curselection())))
 bookname__LP1.bind("<<ListboxSelect>>", List1_Select)
 chapter_num__LP2.bind("<<ListboxSelect>>", List2_Select)
-verse_num__LP3.bind("<<ListboxSelect>>", List3_Select)
-verse_num__LP4.bind("<<ListboxSelect>>", List4_Select)
+
+## newly edit
+# Bind the selection event to the on_item_selected function
+verse_num__Com3.bind("<<ComboboxSelected>>", Verse_Combo3)
+verse_num__Com4.bind("<<ComboboxSelected>>", Verse_Combo4)
+newFont__Com.bind("<<ComboboxSelected>>", ChangeFont)
+newTheme__Com.bind("<<ComboboxSelected>>", ChangeTheme)
+
+# verse_num__LP3.bind("<<ListboxSelect>>", List3_Select)
+# verse_num__LP4.bind("<<ListboxSelect>>", List4_Select)
 
 ## layout management
 define_layout(window, cols=2, rows=2)
@@ -776,7 +1003,6 @@ define_layout(div1)
 define_layout(div2, rows=2)
 define_layout(div3, rows=4)
 define_layout(div4, rows=4)
-
 
 def on_closing():
 	global timmer_count_
