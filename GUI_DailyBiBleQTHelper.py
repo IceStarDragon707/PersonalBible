@@ -44,6 +44,224 @@ else:
 
 ##### ------------------------- next update ------------------------- #####
 
+def on_main_window_close():
+    print("Main window is closing")
+    root.destroy()
+## pop-out screen
+def on_sub_window_close(sub_window_id):
+	print("Sub-window is closing")
+	if sub_window_id==1:
+		sub_window1.destroy()
+		open_sub_window_button1.config(text="<開啟>\n靈修筆記區")
+	elif sub_window_id==2:
+		sub_window2.destroy()
+		open_sub_window_button2.config(text="<開啟>\n歸納式查經")
+	# sub_window.grab_release()  # Release grab on sub-window
+def on_sub_window_resize(sub_window, size_label):
+	width = sub_window.winfo_width()
+	height = sub_window.winfo_height()
+	size_label.config(text=f"Width: {width}, Height: {height}")
+def open_sub_window__default():
+	if sub_window is None or not sub_window.winfo_exists():
+		sub_window = tk.Toplevel(window)
+		sub_window.title("Div")
+		
+		notebook = tk.ttk.Notebook(sub_window)
+		notebook.pack(fill="both", expand=True)
+		
+		div_frame = tk.ttk.Frame(notebook)
+		notebook.add(div_frame, text="Div")
+		
+		button1 = tk.ttk.Button(div_frame, text="Button 1")
+		button2 = tk.ttk.Button(div_frame, text="Button 2")
+		combobox1 = tk.ttk.Combobox(div_frame, values=["Option 1", "Option 2"])
+		combobox2 = tk.ttk.Combobox(div_frame, values=["Option A", "Option B"])
+		button1.pack(padx=10, pady=5)
+		button2.pack(padx=10, pady=5)
+		combobox1.pack(padx=10, pady=5)
+		combobox2.pack(padx=10, pady=5)
+	else:
+		sub_window1.grab_set()  # Prevent interactions with main window
+		flash_sub_window(sub_window1)
+subwindow1_fontsize_index = 0
+subwindow2_fontsize_index = 0
+Note__fontsize_array = [12, 14, 16, 18, 20]
+subwindow1_font = "TkDefaultFont"
+subwindow2_font = "TkDefaultFont"
+def NoteContent__font_size_increase(NoteContent_Text, id_, subwindow_default_font):
+	global subwindow1_fontsize_index
+	global subwindow2_fontsize_index
+	global Note__fontsize_array
+	if id_==1:
+		Note__fontsize_array_index = subwindow1_fontsize_index
+	elif id_==2:
+		Note__fontsize_array_index = subwindow2_fontsize_index
+	tmp_Note__fontsize_array_index = Note__fontsize_array_index + 1
+	if tmp_Note__fontsize_array_index>=len(Note__fontsize_array):
+		result = tkm.askyesno("提示~", "字體最大 = %d"%Note__fontsize_array[Note__fontsize_array_index])
+		Note__fontsize_array_index = len(Note__fontsize_array) - 1
+	else:
+		Note__fontsize_array_index = tmp_Note__fontsize_array_index
+	if id_==1:
+		subwindow1_fontsize_index = Note__fontsize_array_index
+	elif id_==2:
+		subwindow2_fontsize_index = Note__fontsize_array_index
+	print('Change Text Font-Size To %d' % Note__fontsize_array[Note__fontsize_array_index])
+	font_style = (subwindow_default_font, Note__fontsize_array[Note__fontsize_array_index])
+	NoteContent_Text.tag_configure("custom_font", font=font_style)
+	NoteContent_Text.tag_add("custom_font", "1.0", tk.END)
+def NoteContent__font_size_decrease(NoteContent_Text, id_, subwindow_default_font):
+	global subwindow1_fontsize_index
+	global subwindow2_fontsize_index
+	global Note__fontsize_array
+	if id_==1:
+		Note__fontsize_array_index = subwindow1_fontsize_index
+	elif id_==2:
+		Note__fontsize_array_index = subwindow2_fontsize_index
+	tmp_Note__fontsize_array_index = Note__fontsize_array_index - 1
+	if tmp_Note__fontsize_array_index<0:
+		result = tkm.askyesno("提示~", "字體最小 = %d"%Note__fontsize_array[Note__fontsize_array_index])
+		Note__fontsize_array_index = 0
+	else:
+		Note__fontsize_array_index = tmp_Note__fontsize_array_index
+	if id_==1:
+		subwindow1_fontsize_index = Note__fontsize_array_index
+	elif id_==2:
+		subwindow2_fontsize_index = Note__fontsize_array_index
+	print('Change Text Font-Size To %d' % Note__fontsize_array[Note__fontsize_array_index])
+	font_style = (subwindow_default_font, Note__fontsize_array[Note__fontsize_array_index])
+	NoteContent_Text.tag_configure("custom_font", font=font_style)
+	NoteContent_Text.tag_add("custom_font", "1.0", tk.END)
+def str__ChangeFont(NoteContent_Text, FontSelected, id_):
+	global Note__fontsize_array_index
+	global Note__fontsize_array
+	global subwindow1_font
+	global subwindow2_font
+	if FontSelected:
+		print('Change Text Font To %r' % newFont__Com.get())
+		font_style = (FontSelected, Note__fontsize_array[Note__fontsize_array_index])
+		NoteContent_Text.tag_configure("custom_font", font=font_style)
+		NoteContent_Text.tag_add("custom_font", "1.0", tk.END)
+	if id_==1:
+		subwindow1_font = FontSelected
+	elif id_==1:
+		subwindow2_font = FontSelected
+global_color_list = ['black', 'red', 'blue', 'yellow', 'purple']
+def str__ChangeColor(NoteContent_Text, ColorSelected, id_):
+	global subwindow1_fontcolor
+	global subwindow2_fontcolor
+	global subwindow1_font
+	global subwindow2_font
+	if ColorSelected:
+		font_style = (subwindow1_font if id_==1 else subwindow2_font, Note__fontsize_array[Note__fontsize_array_index])
+		NoteContent_Text.tag_configure("custom_color", foreground=ColorSelected)
+		NoteContent_Text.tag_add("custom_color", "1.0", tk.END)
+	if id_==1:
+		subwindow1_fontcolor = ColorSelected
+	elif id_==1:
+		subwindow2_fontcolor = ColorSelected
+def open_sub_window_1():
+	global window
+	global sub_window1
+	if sub_window1 is None or not sub_window1.winfo_exists():
+		open_sub_window_button1.config(text="<顯示>\n靈修筆記區")
+		sub_window1 = tk.Toplevel(window)
+		sub_window1.title("靈修筆記區")
+		
+		sub_window1.protocol("WM_DELETE_WINDOW", lambda: on_sub_window_close(sub_window_id=1))  # Set up detection
+
+		notebook = tk.ttk.Notebook(sub_window1)
+		notebook.pack(fill="both", expand=True)
+		
+		div_frame = tk.ttk.Frame(notebook)
+		notebook.add(div_frame, text="Div")
+		
+		NoteContent_Text = tk.Text(div_frame, font=("Times New Roman", Note__fontsize_array[Note__fontsize_array_index]), wrap='word')
+		NoteContent_Text_scrollbar = tk.Scrollbar(div_frame)
+		NoteContent_Text.config(yscrollcommand=NoteContent_Text_scrollbar.set) ## 設定讀條(scrolling-bar)調比例與內容相同
+		NoteContent_Text_scrollbar.config(command=NoteContent_Text.yview) ## 設定讀條(scrolling-bar)可以做用在textbox上
+		NoteContent_Text.grid(column=1, row=1, columnspan=4, sticky=align_mode)
+		NoteContent_Text_scrollbar.grid(column=5, row=1, columnspan=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+
+		# button1 = tk.ttk.Button(div_frame, text="Button 1")
+		# button2 = tk.ttk.Button(div_frame, text="Button 2")
+		# combobox1 = tk.ttk.Combobox(div_frame, values=["Option 1", "Option 2"])
+		# combobox2 = tk.ttk.Combobox(div_frame, values=["Option A", "Option B"])
+		# button1.pack(padx=10, pady=5)
+		# button2.pack(padx=10, pady=5)
+		# combobox1.pack(padx=10, pady=5)
+		# combobox2.pack(padx=10, pady=5)
+
+		size_label = tk.Label(div_frame, text="Width: 300, Height: 200")
+		# size_label.pack(padx=20, pady=10)
+		size_label.grid(column=0, row=2, columnspan=2, sticky=align_mode)
+
+		sub_window1.bind("<Configure>", lambda x: on_sub_window_resize(sub_window1, size_label))
+	else:
+		# sub_window1.grab_set()  # Prevent interactions with main window
+		flash_sub_window(sub_window1)
+def open_sub_window_2():
+	global window
+	global sub_window2
+	global global_font_usable_list
+	global global_color_list
+	global subwindow2_font
+	global subwindow2_fontcolor
+	global subwindow2_fontsize_index
+	if sub_window2 is None or not sub_window2.winfo_exists():
+		open_sub_window_button2.config(text="<顯示>\n歸納式查經")
+		sub_window2 = tk.Toplevel(window)
+		sub_window2.title("歸納式查經區")
+		
+		sub_window2.protocol("WM_DELETE_WINDOW", lambda: on_sub_window_close(sub_window_id=2))  # Set up detection
+
+		notebook = tk.ttk.Notebook(sub_window2)
+		notebook.pack(fill="both", expand=True)
+		
+		div_frame = tk.ttk.Frame(notebook)
+		notebook.add(div_frame, text="Div")
+		
+		NoteContent_Text = tk.Text(div_frame, font=("Times New Roman", Note__fontsize_array[subwindow2_fontsize_index]), wrap='word')
+		NoteContent_Text_scrollbar = tk.Scrollbar(div_frame)
+		NoteContent_Text.config(yscrollcommand=NoteContent_Text_scrollbar.set) ## 設定讀條(scrolling-bar)調比例與內容相同
+		NoteContent_Text_scrollbar.config(command=NoteContent_Text.yview) ## 設定讀條(scrolling-bar)可以做用在textbox上
+		NoteContent_Text.grid(column=1, row=3, columnspan=4, sticky=align_mode)
+		NoteContent_Text_scrollbar.grid(column=5, row=3, columnspan=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+
+		# button1 = tk.ttk.Button(div_frame, text="Button 1")
+		# button2 = tk.ttk.Button(div_frame, text="Button 2")
+		NoteContent__fontsize_add_button = tk.ttk.Button(div_frame, text="+", style="Square.TButton", command=lambda :NoteContent__font_size_increase(NoteContent_Text, 2, subwindow2_font))
+		NoteContent__fontsize_add_button.grid(row=1, column=1, ipadx=int(pad/2), padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+		NoteContent__fontsize_minus_button = tk.ttk.Button(div_frame, text="-", style="Square.TButton", command=lambda :NoteContent__font_size_decrease(NoteContent_Text, 2, subwindow2_font))
+		NoteContent__fontsize_minus_button.grid(row=1, column=4, ipadx=int(pad/2), padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+
+
+		# combobox1 = tk.ttk.Combobox(div_frame, values=["Option 1", "Option 2"])
+		# combobox2 = tk.ttk.Combobox(div_frame, values=["Option A", "Option B"])
+		newFont__Com = tk.ttk.Combobox(div_frame, width=10, height=5, values=global_font_usable_list)
+		newFont__Com.grid(row=2, column=1, columnspan=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+		newFont__Com.set("字體字型")
+		newColor__Com = tk.ttk.Combobox(div_frame, width=10, height=5, values=global_color_list)
+		newColor__Com.grid(row=2, column=3, columnspan=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+		newColor__Com.set("字體顏色")
+
+
+		size_label = tk.Label(div_frame, text="Width: 300, Height: 200")
+		size_label.grid(column=2, row=1, columnspan=2, sticky=align_mode)
+
+
+		sub_window2.bind("<Configure>", lambda x: on_sub_window_resize(sub_window2, size_label))
+		# Bind the selection event to the on_item_selected function
+		newFont__Com.bind("<<ComboboxSelected>>", lambda x: str__ChangeFont(NoteContent_Text, newFont__Com.get(), 2))
+		newColor__Com.bind("<<ComboboxSelected>>", lambda x: str__ChangeColor(NoteContent_Text, newColor__Com.get(), 2))
+	else:
+		flash_sub_window(sub_window2)
+
+def flash_sub_window(window, flashes=7, delay=20):
+	if flashes >= 0:
+		window.after(delay, lambda: window.lower() if flashes % 2 else window.lift())
+		window.after(delay * 2, lambda: flash_sub_window(window, flashes - 1, delay))
+
 ## func
 def define_layout(obj, cols=1, rows=1):
 	def method(trg, col, row):
@@ -68,6 +286,13 @@ def hcf(num1, num2):
 			ans = i
 	return ans
 
+def UpdateDisplayStyle():
+	global Content__fontsize_array_index
+	global Content__fontsize_array
+	global default_font
+	font_style = (default_font, Content__fontsize_array[Content__fontsize_array_index])
+	BibleContent_Text.tag_configure("custom_font", font=font_style)
+	BibleContent_Text.tag_add("custom_font", "1.0", tk.END)
 def displayScript(title, data):
 	global BibleTitle_Text
 	global global_is_editable
@@ -80,7 +305,7 @@ def displayScript(title, data):
 		BibleContent_Text.insert(tk.INSERT, '\n'.join(data))
 		# global_word_content.set('\n'.join(data))
 		BibleContent_Text.config(state='disabled')
-
+		UpdateDisplayStyle()
 
 ## controler
 def TextBoxStatusChanging(global_is_editable):
@@ -197,15 +422,20 @@ def List2_Select(event):
 	# cn_box.delete(0, 'end')
 	# cn_box.insert('end', BibleTitle_Text)
 	# lbl_quote.text = BibleTitle_Text
-def List3_Select(event):
+
+## new edit
+# def List3_Select(event):
+def Combo3_Select(selected_index):
 	global global__list_text3
 	global global_debug_mode
 	global timmer_count_
 	global timer_readtime
 
 	try: ## because when selecting over another ListBox, will cause and out-of-range error
-		selection_index_LB3 = event.widget.curselection()[0]
-		global__list_text3 = selection_index_LB3+1
+		## new
+		# selection_index_LB3 = event.widget.curselection()[0]
+		# global__list_text3 = selection_index_LB3+1
+		global__list_text3 = selected_index
 		if global_debug_mode:
 			print('Item Selection = [%d]' % global__list_text3)
 	except:
@@ -233,15 +463,18 @@ def List3_Select(event):
 	except:
 		print('', end='')
 		return ;
-def List4_Select(event):
+# def List4_Select(event):
+def Combo4_Select(selected_index):
 	global global__list_text1, global__list_text2, global__list_text3,  global__list_text4
 	global global_debug_mode
 	global timmer_count_
 	global timer_readtime
 
 	try: ## because when selecting over another ListBox, will cause and out-of-range error
-		selection_index_LB4 = event.widget.curselection()[0]
-		global__list_text4 = selection_index_LB4+1
+		## new
+		# selection_index_LB4 = event.widget.curselection()[0]
+		# global__list_text4 = selection_index_LB4+1
+		global__list_text4 = selected_index
 		if global_debug_mode:
 			print('Item Selection = [%d]' % global__list_text4)
 	except:
@@ -271,67 +504,111 @@ def List4_Select(event):
 ## new edit
 def Verse_Combo3(event):
 	selected_item = verse_num__Com3.get()
-	print("Selected:", selected_item)
+	# print("Selected:", selected_item)
+	Combo3_Select(int(selected_item))
+
 def Verse_Combo4(event):
 	selected_item = verse_num__Com4.get()
-	print("Selected:", selected_item)
-font_array_index = 0
-font_array = [12, 14, 16, 18, 20]
+	# print("Selected:", selected_item)
+	Combo4_Select(int(selected_item))
+
+Content__fontsize_array_index = 1
+Content__fontsize_array = [12, 14, 16, 18, 20]
 default_font = "TkDefaultFont"
 def BibleContent__font_size_increase():
-	global font_array_index
-	global font_array
+	global Content__fontsize_array_index
+	global Content__fontsize_array
 	global default_font
-	tmp_font_array_index = font_array_index + 1
-	if tmp_font_array_index>=len(font_array):
-		result = tkm.askyesno("提示~", "字體最大 = %d"%font_array[font_array_index])
-		font_array_index = len(font_array) - 1
+	tmp_Content__fontsize_array_index = Content__fontsize_array_index + 1
+	if tmp_Content__fontsize_array_index>=len(Content__fontsize_array):
+		result = tkm.askyesno("提示~", "字體最大 = %d"%Content__fontsize_array[Content__fontsize_array_index])
+		Content__fontsize_array_index = len(Content__fontsize_array) - 1
 	else:
-		font_array_index = tmp_font_array_index
-	print('Change Text Font-Size To %d' % font_array[font_array_index])
-	font_style = (default_font, font_array[font_array_index])
+		Content__fontsize_array_index = tmp_Content__fontsize_array_index
+	print('Change Text Font-Size To %d' % Content__fontsize_array[Content__fontsize_array_index])
+	font_style = (default_font, Content__fontsize_array[Content__fontsize_array_index])
 	BibleContent_Text.tag_configure("custom_font", font=font_style)
 	BibleContent_Text.tag_add("custom_font", "1.0", tk.END)
 def BibleContent__font_size_decrease():
-	global font_array_index
-	global font_array
+	global Content__fontsize_array_index
+	global Content__fontsize_array
 	global default_font
-	tmp_font_array_index = font_array_index - 1
-	if tmp_font_array_index<0:
-		result = tkm.askyesno("提示~", "字體最小 = %d"%font_array[font_array_index])
-		font_array_index = 0
+	tmp_Content__fontsize_array_index = Content__fontsize_array_index - 1
+	if tmp_Content__fontsize_array_index<0:
+		result = tkm.askyesno("提示~", "字體最小 = %d"%Content__fontsize_array[Content__fontsize_array_index])
+		Content__fontsize_array_index = 0
 	else:
-		font_array_index = tmp_font_array_index
-	print('Change Text Font-Size To %d' % font_array[font_array_index])
-	font_style = (default_font, font_array[font_array_index])
+		Content__fontsize_array_index = tmp_Content__fontsize_array_index
+	print('Change Text Font-Size To %d' % Content__fontsize_array[Content__fontsize_array_index])
+	font_style = (default_font, Content__fontsize_array[Content__fontsize_array_index])
 	BibleContent_Text.tag_configure("custom_font", font=font_style)
 	BibleContent_Text.tag_add("custom_font", "1.0", tk.END)
-Title__font_array_index = 0
-Title__font_array = [16, 18, 20, 22, 24, 26, 28, 30, 32]
+Title__fontsize_array_index = 1
+Title__fontsize_array = [16, 20, 24, 26, 30, 32]
+MenuElement__fontsize_array_index = 1
+MenuElement__fontsize_array = [10, 12, 14, 16, 18, 20]
+def increase(text, value, arr):
+	value += 1
+	if value>=len(arr):
+		value = len(arr) - 1
+		result = tkm.askyesno("提示~", "%s = %d"%(text[0], arr[-1]))
+	print('Change %s Text Font-Size To %d' % (text[1], arr[value]))
+	return value
+def decrease(text, value, arr):
+	value -= 1
+	if value<0:
+		value = 0
+		result = tkm.askyesno("提示~", "%s = %d"%(text[0], arr[0]))
+	print('Change %s Text Font-Size To %d' % (text[1], arr[value]))
+	return value
 def BibleTitle__font_size_increase():
 	global default_font
-	global Title__font_array_index
-	global Title__font_array
-	tmp_font_array_index = Title__font_array_index + 1
-	if tmp_font_array_index>=len(Title__font_array):
-		result = tkm.askyesno("提示~", "字體最大 = %d"%Title__font_array[Title__font_array_index])
-		Title__font_array_index = len(Title__font_array) - 1
-	else:
-		Title__font_array_index = tmp_font_array_index
-	print('Change Title Text Font-Size To %d' % Title__font_array[Title__font_array_index])
-	lbl_quote.config(font=(default_font, Title__font_array[Title__font_array_index]))
+	global Title__fontsize_array_index
+	global Title__fontsize_array
+	global MenuElement__fontsize_array_index
+	global MenuElement__fontsize_array
+	Title__fontsize_array_index = increase(
+		['字體最大', 'Title'],
+		Title__fontsize_array_index, Title__fontsize_array
+	)
+	lbl_quote.config(font=(default_font, Title__fontsize_array[Title__fontsize_array_index]))
+
+	MenuElement__fontsize_array_index = increase(
+		['清單字體最大', 'Menu Element'],
+		MenuElement__fontsize_array_index, MenuElement__fontsize_array
+	)
+	new_font_size = MenuElement__fontsize_array[MenuElement__fontsize_array_index]
+	bookname__LP1.config(font=(default_font, new_font_size))
+	chapter_num__LP2.config(font=(default_font, new_font_size))
+	verse_num__Com3.config(font=(default_font, new_font_size))
+	verse_num__Com4.config(font=(default_font, new_font_size))
+
+	lbl_random_title.config(font=(default_font, new_font_size))
+	select_list1.config(font=(default_font, new_font_size))
 def BibleTitle__font_size_decrease():
 	global default_font
-	global Title__font_array_index
-	global Title__font_array
-	tmp_font_array_index = Title__font_array_index - 1
-	if tmp_font_array_index<0:
-		result = tkm.askyesno("提示~", "字體最小 = %d"%Title__font_array[Title__font_array_index])
-		Title__font_array_index = 0
-	else:
-		Title__font_array_index = tmp_font_array_index
-	print('Change Title Text Font-Size To %d' % Title__font_array[Title__font_array_index])
-	lbl_quote.config(font=(default_font, Title__font_array[Title__font_array_index]))
+	global Title__fontsize_array_index
+	global Title__fontsize_array
+	global MenuElement__fontsize_array_index
+	global MenuElement__fontsize_array
+	Title__fontsize_array_index = decrease(
+		['字體最小', 'Title'],
+		Title__fontsize_array_index, Title__fontsize_array
+	)
+	lbl_quote.config(font=(default_font, Title__fontsize_array[Title__fontsize_array_index]))
+
+	MenuElement__fontsize_array_index = decrease(
+		['清單字體最小', 'Menu Element'],
+		MenuElement__fontsize_array_index, MenuElement__fontsize_array
+	)
+	new_font_size = MenuElement__fontsize_array[MenuElement__fontsize_array_index]
+	bookname__LP1.config(font=(default_font, new_font_size))
+	chapter_num__LP2.config(font=(default_font, new_font_size))
+	verse_num__Com3.config(font=(default_font, new_font_size))
+	verse_num__Com4.config(font=(default_font, new_font_size))
+
+	lbl_random_title.config(font=(default_font, new_font_size))
+	select_list1.config(font=(default_font, new_font_size))
 def checkFontusale(arr):
 	arr_ = []
 	for font_name in arr:
@@ -342,17 +619,17 @@ def checkFontusale(arr):
 			print('', end='')
 	return arr_
 def ChangeFont(event):
-	global font_array_index
-	global font_array
+	global Content__fontsize_array_index
+	global Content__fontsize_array
 	global default_font
 	tmp_default_font = newFont__Com.get()
 	if tmp_default_font:
 		default_font = tmp_default_font
 		print('Change Text Font To %r' % newFont__Com.get())
-		font_style = (default_font, font_array[font_array_index])
+		font_style = (default_font, Content__fontsize_array[Content__fontsize_array_index])
 		BibleContent_Text.tag_configure("custom_font", font=font_style)
 		BibleContent_Text.tag_add("custom_font", "1.0", tk.END)
-		lbl_quote.config(font=(default_font, Title__font_array[Title__font_array_index]))
+		lbl_quote.config(font=(default_font, Title__fontsize_array[Title__fontsize_array_index]))
 def ChangeTheme(event):
 	tmp_default_font = newTheme__Com.get()
 	## change color ##
@@ -826,7 +1103,7 @@ window.columnconfigure(3, weight=0)
 # lbl_title1 = tk.Label(div2, text='Hello', bg='orange', fg='white')
 # lbl_title2 = tk.Label(div2, text="World", bg='orange', fg='white')
 lbl_quote = tk.Label(div4, textvariable=BibleTitle_Text, bg='#E7A10A', fg='#70FA0A', font=("微軟黑正體", 14, "bold"))
-lbl_random_title = tk.Label(div3, text="每日經文", bg='green', fg='white', font=("微軟黑正體", 10, "italic underline"))  # "bold italic underline overstrike"
+lbl_random_title = tk.Label(div3, text="每日經文", height=3, bg='green', fg='white', font=("微軟黑正體", MenuElement__fontsize_array[MenuElement__fontsize_array_index], "italic underline"))  # "bold italic underline overstrike"
 previous_script = tk.Button(div4, text='Previous Script', bg='blue', fg='white', command=lambda: switch_script('previous'))
 next_script = tk.Button(div4, text='Next Script', bg='blue', fg='white', command=lambda: switch_script('next'))
 
@@ -849,16 +1126,20 @@ next_script.grid(column=2, row=0, sticky=align_mode)
 
 checkbox1 = tk.Checkbutton(div4, text="Edit Text", variable=global_is_editable)
 checkbox1.grid(column=4, row=0, sticky=align_mode)
+# checkbox1.state(("disabled",)) ## for ttk.Checkbutton
+checkbox1.configure(state=tk.DISABLED)
 
-BibleContent_Text = tk.Text(div4, font=("Times New Roman", font_array[font_array_index]), wrap='word')
+BibleContent_Text = tk.Text(div4, font=("Times New Roman", Content__fontsize_array[Content__fontsize_array_index]), wrap='word')
 BibleContent_Text_scrollbar = tk.Scrollbar(div4)
 
 BibleContent_Text.config(yscrollcommand=BibleContent_Text_scrollbar.set) ## 設定讀條(scrolling-bar)調比例與內容相同
 BibleContent_Text_scrollbar.config(command=BibleContent_Text.yview) ## 設定讀條(scrolling-bar)可以做用在textbox上
 BibleContent_Text.grid(column=0, row=1, columnspan=4, sticky=align_mode)
 BibleContent_Text_scrollbar.grid(column=4, row=1, columnspan=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
-
 select_list1 = tk.OptionMenu(div3, option_menu_item_list_var, *option_menu_options, command=lambda x: RandomChapterSelection(option_menu_item_list_var.get()))
+select_list1.config(width=45)
+select_list1.config(height=3)
+select_list1.config(font=("微軟黑正體", MenuElement__fontsize_array[MenuElement__fontsize_array_index]))
 select_list1.grid(column=0, row=2, columnspan=2, sticky=align_mode)
 
 
@@ -869,27 +1150,29 @@ select_list1.grid(column=0, row=2, columnspan=2, sticky=align_mode)
 
 # bookname_choices = [booknames_ch[index]+'    '+booknames_en[index] for index in range(len(booknames_ch))]
 bookname_choices = [name.bookname for name in BDR.list_]
-bookname__LP1 = tk.Listbox(div1, listvariable=tk.StringVar(value=bookname_choices))
+bookname__LP1 = tk.Listbox(div1, listvariable=tk.StringVar(value=bookname_choices), width=16)
 bookname__LP1.grid(row=1, column=0, rowspan=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
 global__chapter_num_choice = [-1]
-chapter_num__LP2 = tk.Listbox(div1, listvariable=tk.StringVar(value=global__chapter_num_choice))
+chapter_num__LP2 = tk.Listbox(div1, listvariable=tk.StringVar(value=global__chapter_num_choice), width=17)
 chapter_num__LP2.grid(row=1, column=1, rowspan=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
 
 ## newly edit
 # Create a Combobox widget
 # verse_num__Com3 = tk_combo.Combobox(div1, values=["Item 1", "Item 2", "Item 3", "Item 4", "Item 5"])
 global__verse_num_choice_S = [-1]
-verse_num__Com3 = tk.ttk.Combobox(div1, values=global__verse_num_choice_S)
+verse_num__Com3 = tk.ttk.Combobox(div1, values=global__verse_num_choice_S, width=15)
 verse_num__Com3.grid(row=1, column=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
 # Set an initial value
-verse_num__Com3.set("Select Start Verse")
+# verse_num__Com3.set("Select Start Verse")
+verse_num__Com3.set("開始小節")
 
 # verse_num__Com4 = tk_combo.Combobox(div1, values=["Item 1", "Item 2", "Item 3", "Item 4", "Item 5"])
 global__verse_num_choice_E = [-1]
-verse_num__Com4 = tk.ttk.Combobox(div1, values=global__verse_num_choice_E)
+verse_num__Com4 = tk.ttk.Combobox(div1, values=global__verse_num_choice_E, width=15)
 # verse_num__Com4.grid(row=2, column=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
 verse_num__Com4.grid(row=1, column=3, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
-verse_num__Com4.set("Select End Verse")
+# verse_num__Com4.set("Select End Verse")
+verse_num__Com4.set("結束小節")
 
 # global__verse_num_choice_S = [-1]
 # verse_num__LP3 = tk.Listbox(div1, listvariable=tk.StringVar(value=global__verse_num_choice_S))
@@ -902,7 +1185,7 @@ verse_num__Com4.set("Select End Verse")
 ## add new button with different function
 style = tk.ttk.Style()
 ## Define a custom style
-style.configure("Square.TButton", font=("Arial", 16), width=5, height=5)
+style.configure("Square.TButton", font=("Arial", 16), width=4, height=5)
 BibleTitle__fontsize_add_button = tk.ttk.Button(div1_toolpack, text="+", style="Square.TButton", command=BibleTitle__font_size_increase)
 BibleTitle__fontsize_add_button.grid(row=1, column=1, ipadx=int(pad/2), padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
 BibleTitle__fontsize_minus_button = tk.ttk.Button(div1_toolpack, text="-", style="Square.TButton", command=BibleTitle__font_size_decrease)
@@ -914,7 +1197,7 @@ BibleContent__fontsize_add_button.grid(row=2, column=1, ipadx=int(pad/2), padx=p
 BibleContent__fontsize_minus_button = tk.ttk.Button(div1_toolpack, text="-", style="Square.TButton", command=BibleContent__font_size_decrease)
 BibleContent__fontsize_minus_button.grid(row=2, column=2, ipadx=int(pad/2), padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
 
-global_font_usable = checkFontusale([
+global_font_usable_list = checkFontusale([
 	'Arial', 
 	'Times New Roman', 
 	'Calibri', 
@@ -932,15 +1215,24 @@ global_font_usable = checkFontusale([
 	'AR PL KaitiM Uni', 
 	'Droid Sans Fallback'
 ])
-newFont__Com = tk.ttk.Combobox(div1_toolpack, width=10, height=5, values=global_font_usable)
+newFont__Com = tk.ttk.Combobox(div1_toolpack, width=10, height=5, values=global_font_usable_list)
 newFont__Com.grid(row=1, column=3, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
 newFont__Com.set("可用字體") # (若為空白，則不支援其他預設)")
 
 global_theme = ['Default']
 newTheme__Com = tk.ttk.Combobox(div1_toolpack, width=10, height=5, values=global_theme)
 newTheme__Com.grid(row=1, column=4, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
-newTheme__Com.set("選用顏色主題")
+newTheme__Com.set("主題顏色")
 
+
+sub_window = None
+sub_window1 = None
+open_sub_window_button1 = tk.Button(div1_toolpack, text="<開啟>\n靈修筆記區", command=open_sub_window_1)
+# open_sub_window_button.pack(padx=20, pady=10)
+open_sub_window_button1.grid(row=2, column=3, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+sub_window2 = None
+open_sub_window_button2 = tk.Button(div1_toolpack, text="<開啟>\n歸納式查經", command=open_sub_window_2)
+open_sub_window_button2.grid(row=2, column=4, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
 
 
 div1.rowconfigure(0, weight=1)
