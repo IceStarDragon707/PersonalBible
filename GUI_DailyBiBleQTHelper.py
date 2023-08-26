@@ -11,6 +11,7 @@ import os
 import requests
 from tkinter import ttk as tk_combo
 from tkinter import font
+from tkinter import filedialog
 
 
 ##### ------------------------- next update : astract ------------------------- #####
@@ -83,6 +84,11 @@ def open_sub_window__default():
 	else:
 		sub_window1.grab_set()  # Prevent interactions with main window
 		flash_sub_window(sub_window1)
+def str__ChangeFontSize(NoteContent_Text, arr, index, font):
+	print('Change Text Font-Size To %d' % arr[index])
+	font_style = (font, arr[index])
+	NoteContent_Text.tag_configure("custom_font", font=font_style)
+	NoteContent_Text.tag_add("custom_font", "1.0", tk.END)
 subwindow1_fontsize_index = 0
 subwindow2_fontsize_index = 0
 Note__fontsize_array = [12, 14, 16, 18, 20]
@@ -98,7 +104,9 @@ def NoteContent__font_size_increase(NoteContent_Text, id_, subwindow_default_fon
 		Note__fontsize_array_index = subwindow2_fontsize_index
 	tmp_Note__fontsize_array_index = Note__fontsize_array_index + 1
 	if tmp_Note__fontsize_array_index>=len(Note__fontsize_array):
-		result = tkm.askyesno("提示~", "字體最大 = %d"%Note__fontsize_array[Note__fontsize_array_index])
+		(sub_window1 if id_==1 else sub_window2).grab_set()
+		if tkm.askyesno("提示~", "字體最大 = %d"%Note__fontsize_array[Note__fontsize_array_index]):
+			(sub_window1 if id_==1 else sub_window2).grab_release()  # Release the grab on the sub-window
 		Note__fontsize_array_index = len(Note__fontsize_array) - 1
 	else:
 		Note__fontsize_array_index = tmp_Note__fontsize_array_index
@@ -106,10 +114,12 @@ def NoteContent__font_size_increase(NoteContent_Text, id_, subwindow_default_fon
 		subwindow1_fontsize_index = Note__fontsize_array_index
 	elif id_==2:
 		subwindow2_fontsize_index = Note__fontsize_array_index
-	print('Change Text Font-Size To %d' % Note__fontsize_array[Note__fontsize_array_index])
-	font_style = (subwindow_default_font, Note__fontsize_array[Note__fontsize_array_index])
-	NoteContent_Text.tag_configure("custom_font", font=font_style)
-	NoteContent_Text.tag_add("custom_font", "1.0", tk.END)
+	str__ChangeFontSize(NoteContent_Text, Note__fontsize_array, Note__fontsize_array_index, subwindow_default_font)
+	# print('Change Text Font-Size To %d' % Note__fontsize_array[Note__fontsize_array_index])
+	# font_style = (subwindow_default_font, Note__fontsize_array[Note__fontsize_array_index])
+	# NoteContent_Text.tag_configure("custom_font", font=font_style)
+	# NoteContent_Text.tag_add("custom_font", "1.0", tk.END)
+	flash_sub_window(sub_window1 if id_==1 else sub_window2, 0)
 def NoteContent__font_size_decrease(NoteContent_Text, id_, subwindow_default_font):
 	global subwindow1_fontsize_index
 	global subwindow2_fontsize_index
@@ -120,7 +130,9 @@ def NoteContent__font_size_decrease(NoteContent_Text, id_, subwindow_default_fon
 		Note__fontsize_array_index = subwindow2_fontsize_index
 	tmp_Note__fontsize_array_index = Note__fontsize_array_index - 1
 	if tmp_Note__fontsize_array_index<0:
-		result = tkm.askyesno("提示~", "字體最小 = %d"%Note__fontsize_array[Note__fontsize_array_index])
+		(sub_window1 if id_==1 else sub_window2).grab_set()
+		if tkm.askyesno("提示~", "字體最小 = %d"%Note__fontsize_array[Note__fontsize_array_index]):
+			(sub_window1 if id_==1 else sub_window2).grab_release()  # Release the grab on the sub-window
 		Note__fontsize_array_index = 0
 	else:
 		Note__fontsize_array_index = tmp_Note__fontsize_array_index
@@ -128,38 +140,161 @@ def NoteContent__font_size_decrease(NoteContent_Text, id_, subwindow_default_fon
 		subwindow1_fontsize_index = Note__fontsize_array_index
 	elif id_==2:
 		subwindow2_fontsize_index = Note__fontsize_array_index
-	print('Change Text Font-Size To %d' % Note__fontsize_array[Note__fontsize_array_index])
-	font_style = (subwindow_default_font, Note__fontsize_array[Note__fontsize_array_index])
-	NoteContent_Text.tag_configure("custom_font", font=font_style)
-	NoteContent_Text.tag_add("custom_font", "1.0", tk.END)
+	str__ChangeFontSize(NoteContent_Text, Note__fontsize_array, Note__fontsize_array_index, subwindow_default_font)
+	# print('Change Text Font-Size To %d' % Note__fontsize_array[Note__fontsize_array_index])
+	# font_style = (subwindow_default_font, Note__fontsize_array[Note__fontsize_array_index])
+	# NoteContent_Text.tag_configure("custom_font", font=font_style)
+	# NoteContent_Text.tag_add("custom_font", "1.0", tk.END)
+	flash_sub_window(sub_window1 if id_==1 else sub_window2, 0)
 def str__ChangeFont(NoteContent_Text, FontSelected, id_):
 	global Note__fontsize_array_index
 	global Note__fontsize_array
 	global subwindow1_font
 	global subwindow2_font
 	if FontSelected:
-		print('Change Text Font To %r' % newFont__Com.get())
-		font_style = (FontSelected, Note__fontsize_array[Note__fontsize_array_index])
+		if ColorSelected!=(subwindow1_font if id_==1 else subwindow2_font):
+			print('Change Text Font To %r' % newFont__Com.get())
+		font_style = (FontSelected, Note__fontsize_array[subwindow1_fontsize_index] if id_==1 else Note__fontsize_array[subwindow2_fontsize_index])
 		NoteContent_Text.tag_configure("custom_font", font=font_style)
 		NoteContent_Text.tag_add("custom_font", "1.0", tk.END)
 	if id_==1:
 		subwindow1_font = FontSelected
-	elif id_==1:
+	elif id_==2:
 		subwindow2_font = FontSelected
-global_color_list = ['black', 'red', 'blue', 'yellow', 'purple']
+global_color_list = ['black', 'dim gray', 'dark slate gray', 'red', 'deep pink', 'blue', 'dodger blue', 'yellow4', 'gold4', 'purple']
+subwindow1_fontcolor = 'black'
+subwindow2_fontcolor = 'black'
 def str__ChangeColor(NoteContent_Text, ColorSelected, id_):
 	global subwindow1_fontcolor
 	global subwindow2_fontcolor
 	global subwindow1_font
 	global subwindow2_font
+	global Note__fontsize_array
+	global subwindow1_fontsize_index
+	global subwindow2_fontsize_index
 	if ColorSelected:
-		font_style = (subwindow1_font if id_==1 else subwindow2_font, Note__fontsize_array[Note__fontsize_array_index])
+		if ColorSelected!=(subwindow1_fontcolor if id_==1 else subwindow2_fontcolor):
+			print('Change Text Color To %r' % ColorSelected)
+		font_style = (subwindow1_font if id_==1 else subwindow2_font, Note__fontsize_array[subwindow1_fontsize_index] if id_==1 else Note__fontsize_array[subwindow2_fontsize_index])
 		NoteContent_Text.tag_configure("custom_color", foreground=ColorSelected)
 		NoteContent_Text.tag_add("custom_color", "1.0", tk.END)
 	if id_==1:
 		subwindow1_fontcolor = ColorSelected
-	elif id_==1:
+	elif id_==2:
 		subwindow2_fontcolor = ColorSelected
+def UpdateNoteStyle(NoteContent_Text, id_):
+	global Note__fontsize_array
+	global subwindow1_fontsize_index
+	global subwindow2_fontsize_index
+	global subwindow1_font
+	global subwindow2_font
+	global subwindow1_fontcolor
+	global subwindow2_fontcolor
+	global default_font
+	if id_==1:
+		str__ChangeColor(NoteContent_Text, subwindow1_fontcolor, id_)
+		str__ChangeFont(NoteContent_Text, subwindow1_font, id_)
+		str__ChangeFontSize(NoteContent_Text, Note__fontsize_array, subwindow1_fontsize_index, Note__fontsize_array[subwindow1_fontsize_index])
+	elif id_==2:
+		str__ChangeColor(NoteContent_Text, subwindow2_fontcolor, id_)
+		str__ChangeFont(NoteContent_Text, subwindow2_font, id_)
+		str__ChangeFontSize(NoteContent_Text, Note__fontsize_array, subwindow2_fontsize_index, Note__fontsize_array[subwindow2_fontsize_index])
+def NoteContent__NewPage(NoteContent_Text, id_, mode):
+	flag = NoteContent_Text.get("1.0", tk.END)=='\n'
+	# print(flag)
+	# [print('%r'%c) for c in NoteContent_Text.get("1.0", tk.END)]
+	flag = flag if flag else NoteContent_Text.get("1.0", tk.END)!='\n' and tkm.askyesno('[警告]', '確定開啟新分頁，若尚未儲存，資料將遭刪除。')
+	# print(flag)
+	if flag:
+		NoteContent_Text.delete(1.0, tk.END)
+		data_exmaples = f'''
+範例 I：
+	(彼前5:7~11)
+		觀察
+			1.什麼是一切的憂慮?
+			2.我為什麼要卸下一切的憂慮?
+			3.我可以如何處理憂慮?
+		解釋
+			1.我所有的難題或掛心的事。
+			2.因為神顧念我，而且魔鬼要吞吃我。
+			3.將憂慮卸給神，求神賜恩典，列下信心不堅固的原因，神召我得永遠的榮耀。
+		應用
+			我不必為我的籌款不足和身體狀況憂慮，我可以禱告並信靠天父，，因祢愛我顧念我，我不要被不好的經驗影響，我要相信祢的呼召和應許。
+範例 II：
+	III_ADVANCED
+		i.學習找出自己的疑問與好奇
+		ii.設身處地思考自己是當事人，並要怎麼解決在自己現在的問題
+		iii.學習思考在這個過程， 神的做為有什麼、神為什麼要這麼做；也可以反思人與 神的顧念與想法有什麼不同
+		iiii.驗證
+	(可4:35~41)
+		觀察
+			1. 門徒為什麼害怕？
+			2.  耶穌為什麼責備他們？
+			III_ADVANCED.i.iii
+				3.  耶穌為什麼在睡覺？還是 他只是真的累了？
+				5. 他們面對風浪的反應？
+			III_ADVANCED.i.ii
+				4. 門徒此時到底覺得 耶穌是誰？
+		解釋
+			1. 因為怕被浪捲走或沉船吧！
+			2. 因為他們不相信 耶穌， 耶穌前面說"我們度到那邊去"？
+			3. (暫時不知道)
+			4. (暫時不知道)
+		應用
+			(針對面對擔憂與害怕，更加的信靠 神)
+			(是否相信 神是掌管萬有的 神)
+			III_ADVANCED.iiii.驗證
+				針對自己的應用，是否可以得到 神的回應
+				(個人)(具體)(有回應)
+
+		'''
+		data_format = f'''
+	(取自'經文')
+		觀察
+			1. ...
+			2. ...
+			3. ...
+		解釋
+			1. ...
+			2. ...
+			3. ...
+		應用
+			1. ...
+			2. ...
+			3. ...
+	III_ADVANCED
+		i.疑問(異想天開)
+		ii.設身處地(自己的應對):(自我與歷史借鑑)
+		iii.屬靈扎根( 神的心意):(人 神對比)
+		iiii.驗證:(提出法則/驗證法則)
+		'''
+		data = '' if mode=='Empty' else '格式：'+data_format if mode=='New' else data_exmaples+'範例 III(格式說明)：'+data_format if 'Examples' else 'IMPOSSIBLE'
+		NoteContent_Text.insert(tk.INSERT, data)
+		UpdateNoteStyle(NoteContent_Text, id_)
+		flash_sub_window(sub_window1 if id_==1 else sub_window2, 0)
+def NoteContent__SaveContent(NoteContent_Text, id_):
+	import subprocess
+	global global_note_directory
+	global sub_window1
+	global sub_window2
+	text_content = NoteContent_Text.get("1.0", tk.END)
+	file_name = str(datetime.today().strftime("%Y-%m-%d"))+'__'+('歸納式查經' if id_==2 else '靈修筆記' if id_==1 else '')+'.txt'
+	if text_content!='':
+		file_path = filedialog.asksaveasfilename(
+			defaultextension=".txt",
+			filetypes=[("Text files", "*.txt")],
+			initialfile=file_name,
+			initialdir=global_note_directory
+			# initialfile="custom_file_name.txt",  # Customize default filename
+			# initialdir="C:/Users/YourUsername/Documents"  # Set initial directory
+		)
+		if file_path:
+			with open(file_path, "w") as file:
+				file.write(text_content)
+			if tkm.askyesno('[注意]', '此檔案(%s)將存在(%r)。是否開啟位置。'%(file_name, global_note_directory)):
+				# os.system()
+				subprocess.Popen(f'explorer "{global_note_directory}"')
+	flash_sub_window(sub_window1 if id_==1 else sub_window2, 0)
 def open_sub_window_1():
 	global window
 	global sub_window1
@@ -225,15 +360,23 @@ def open_sub_window_2():
 		NoteContent_Text_scrollbar = tk.Scrollbar(div_frame)
 		NoteContent_Text.config(yscrollcommand=NoteContent_Text_scrollbar.set) ## 設定讀條(scrolling-bar)調比例與內容相同
 		NoteContent_Text_scrollbar.config(command=NoteContent_Text.yview) ## 設定讀條(scrolling-bar)可以做用在textbox上
-		NoteContent_Text.grid(column=1, row=3, columnspan=4, sticky=align_mode)
-		NoteContent_Text_scrollbar.grid(column=5, row=3, columnspan=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+		NoteContent_Text.grid(row=3, column=1, columnspan=6, sticky=align_mode)
+		NoteContent_Text_scrollbar.grid(row=3, column=7, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
 
 		# button1 = tk.ttk.Button(div_frame, text="Button 1")
 		# button2 = tk.ttk.Button(div_frame, text="Button 2")
 		NoteContent__fontsize_add_button = tk.ttk.Button(div_frame, text="+", style="Square.TButton", command=lambda :NoteContent__font_size_increase(NoteContent_Text, 2, subwindow2_font))
 		NoteContent__fontsize_add_button.grid(row=1, column=1, ipadx=int(pad/2), padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+		NoteContent_Empty_button = tk.Button(div_frame, text="空白筆記頁", command=lambda :NoteContent__NewPage(NoteContent_Text, 2, 'Empty'))
+		NoteContent_Empty_button.grid(row=1, column=2, ipadx=int(pad/2), padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+		NoteContent_New_button = tk.Button(div_frame, text="新筆記", command=lambda :NoteContent__NewPage(NoteContent_Text, 2, 'New'))
+		NoteContent_New_button.grid(row=1, column=3, ipadx=int(pad/2), padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+		NoteContent_Example_button = tk.Button(div_frame, text="新筆記與範例", command=lambda :NoteContent__NewPage(NoteContent_Text, 2, 'Examples'))
+		NoteContent_Example_button.grid(row=1, column=4, ipadx=int(pad/2), padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+		NoteContent_Save_button = tk.Button(div_frame, text="儲存筆記", command=lambda :NoteContent__SaveContent(NoteContent_Text, 2))
+		NoteContent_Save_button.grid(row=1, column=5, ipadx=int(pad/2), padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
 		NoteContent__fontsize_minus_button = tk.ttk.Button(div_frame, text="-", style="Square.TButton", command=lambda :NoteContent__font_size_decrease(NoteContent_Text, 2, subwindow2_font))
-		NoteContent__fontsize_minus_button.grid(row=1, column=4, ipadx=int(pad/2), padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+		NoteContent__fontsize_minus_button.grid(row=1, column=6, ipadx=int(pad/2), padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
 
 
 		# combobox1 = tk.ttk.Combobox(div_frame, values=["Option 1", "Option 2"])
@@ -242,12 +385,12 @@ def open_sub_window_2():
 		newFont__Com.grid(row=2, column=1, columnspan=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
 		newFont__Com.set("字體字型")
 		newColor__Com = tk.ttk.Combobox(div_frame, width=10, height=5, values=global_color_list)
-		newColor__Com.grid(row=2, column=3, columnspan=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+		newColor__Com.grid(row=2, column=5, columnspan=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
 		newColor__Com.set("字體顏色")
 
 
 		size_label = tk.Label(div_frame, text="Width: 300, Height: 200")
-		size_label.grid(column=2, row=1, columnspan=2, sticky=align_mode)
+		size_label.grid(row=2, column=3, columnspan=2, sticky=align_mode)
 
 
 		sub_window2.bind("<Configure>", lambda x: on_sub_window_resize(sub_window2, size_label))
@@ -324,7 +467,12 @@ def List1_Select(event):
 	# global timmer_count_
 
 	try: ## because when selecting over another ListBox, will cause and out-of-range error
-		selection_index_LB1 = event.widget.curselection()[0]
+		selection = bookname__LP1.get(event.widget.curselection()[0])
+		# print(selection+'@ %d'%bookname_choices.index(selection))
+		# selection_index_LB1 = event.widget.curselection()[0]
+		# print(selection_index_LB1, BDR.list_[selection_index_LB1].bookname)
+		selection_index_LB1 = bookname_choices.index(selection)
+		# print(selection_index_LB1, BDR.list_[bookname_choices.index(selection)].bookname)
 		global__list_text1 = BDR.list_[selection_index_LB1].bookname
 		window.title('靈修輔助工具 v2'+' --- 查找 %s'%global__list_text1)
 		global__chapter_num_choice = [i+1 for i in range(BDR.list_[selection_index_LB1].chapter)]
@@ -347,6 +495,8 @@ def List2_Select(event):
 
 	try: ## because when selecting over another ListBox, will cause and out-of-range error
 		selection_index_LB2 = event.widget.curselection()[0]
+		## listbox still have an error: "multiple-click" when "dragging" in the box
+		# chapter_num__LP2.config(state='disabled')
 		global__list_text2 = selection_index_LB2+1
 		if global_debug_mode:
 			print('Item Selection = [%d]' % global__list_text2)
@@ -381,19 +531,23 @@ def List2_Select(event):
 				print(' --- END --- ')
 			if timmer_count_ == -707:
 				record_update('ADD', global_cur_script[0]) ## record the searching result
+				UpdateHistory('ADD', ['?']+[[global__list_text1, global__list_text2]]) ## record the searching result
 			else:
 				if BDR.int_RunTimer() - timmer_count_ > timer_readtime:
 					record_update('ADD', global_cur_script[0]) ## record the searching result
+					UpdateHistory('ADD', ['?']+[[global__list_text1, global__list_text2]]) ## record the searching result
 				else:
 					# if tkm.askyesno('[CHECK]', 'Have You Finished Reading This Chapter ?'):
 					# 	record_update('ADD', global_cur_script[0]) ## record the searching result
 					# else:
 					record_update('COVER-LAST', global_cur_script[0]) ## record the searching result
+					UpdateHistory('COVER-LAST', ['?']+[[global__list_text1, global__list_text2]]) ## delete the last searching result
 			timmer_count_ = BDR.int_RunTimer()
 			displayScript(global_cur_script[0], global_cur_script[1])
 	except:
 		print('', end='')
 		return ;
+	# chapter_num__LP2.config(state='normal')
 	
 	try: ## because when selecting over another ListBox, will cause and out-of-range error
 		selection_index_LB2 = event.widget.curselection()[0]
@@ -426,7 +580,7 @@ def List2_Select(event):
 ## new edit
 # def List3_Select(event):
 def Combo3_Select(selected_index):
-	global global__list_text3
+	global global__list_text1, global__list_text2, global__list_text3
 	global global_debug_mode
 	global timmer_count_
 	global timer_readtime
@@ -451,14 +605,17 @@ def Combo3_Select(selected_index):
 			print(' --- END --- ')
 		if BDR.int_RunTimer() - timmer_count_ > timer_readtime:
 			record_update('ADD', '%s 第%d章 第%d節 開始'%(global__list_text1, global__list_text2, global__list_text3))
+			UpdateHistory('ADD', ['?']+[[global__list_text1, global__list_text2, global__list_text3]]) ## record the searching result
 		else:
 			if tkm.askyesno('[CHECK]', 'Have You Finished Reading This Chapter ?'):
 				record_update('ADD', '%s 第%d章 第%d節 開始'%(global__list_text1, global__list_text2, global__list_text3))
+				UpdateHistory('ADD', ['?']+[[global__list_text1, global__list_text2, global__list_text3]]) ## record the searching result
 			else:
 				# if tkm.askyesno('[CHECK]', 'Have You Finished Reading This Chapter ?'):
 				# 	record_update('ADD', '%s 第%d章 第%d到%d節'%(global__list_text1, global__list_text2, global__list_text3, global__list_text4)) ## record the searching result
 				# else:
 				record_update('COVER-LAST', '%s 第%d章 第%d節 開始'%(global__list_text1, global__list_text2, global__list_text3))
+				UpdateHistory('COVER-LAST', ['?']+[[global__list_text1, global__list_text2, global__list_text3]]) ## delete the last searching result
 		displayScript('%s 第%d章 第%d節 開始'%(global__list_text1, global__list_text2, global__list_text3), global_cur_script[1][global__list_text3-1::])
 	except:
 		print('', end='')
@@ -490,11 +647,13 @@ def Combo4_Select(selected_index):
 			print(' --- END ---')
 		if BDR.int_RunTimer() - timmer_count_ > timer_readtime:
 			record_update('ADD', '%s 第%d章 第%d到%d節'%(global__list_text1, global__list_text2, global__list_text3, global__list_text4)) ## record the searching result
+			UpdateHistory('ADD', ['?']+[[global__list_text1, global__list_text2, global__list_text3, global__list_text4]]) ## record the searching result
 		else:
 			# if tkm.askyesno('[CHECK]', 'Have You Finished Reading This Chapter ?'):
 			# 	record_update('ADD', '%s 第%d章 第%d到%d節'%(global__list_text1, global__list_text2, global__list_text3, global__list_text4)) ## record the searching result
 			# else:
 			record_update('COVER-LAST', '%s 第%d章 第%d到%d節'%(global__list_text1, global__list_text2, global__list_text3, global__list_text4)) ## record the searching result
+			UpdateHistory('COVER-LAST', ['?']+[[global__list_text1, global__list_text2, global__list_text3, global__list_text4]]) ## delete the last searching result
 		timmer_count_ = BDR.int_RunTimer()
 		displayScript('%s 第%d章 第%d到%d節'%(global__list_text1, global__list_text2, global__list_text3, global__list_text4), global_cur_script[1][global__list_text3-1:global__list_text4])
 	except:
@@ -634,7 +793,150 @@ def ChangeTheme(event):
 	tmp_default_font = newTheme__Com.get()
 	## change color ##
 
+# view_history = [("Item 1", "blue"), ("Item 2", "red"), ("Item 3", "green")]
+def updateViewHistory_LP():
+	global view_history
+	view_history_LP.delete(0, "end")
+	for history, color in view_history: #[::-1]:
+		view_history_LP.insert("end", history)
+		view_history_LP.itemconfig(tk.END, {'fg': color})
+def Del_History():
+	selected_index = view_history_LP.curselection()[0]
+	if selected_index:
+		view_history_LP.delete(selected_index)
+def Finish_History():
+	global timmer_count_
+	global view_history
+	selected_index = view_history_LP.curselection()[0]
+	if selected_index==0:
+		timmer_count_ = -707
+	# view_history_LP.delete(selected_index)
+	# new_name = view_history[selected_index][0].replace('▪️', '✓').replace('✗', '✓')
+	# view_history_LP.insert("end", new_name)
+	# view_history_LP.itemconfig(tk.END, {'fg': "green"})
+	view_history[selected_index] = (view_history[selected_index][0].replace('▪️', '✓').replace('✗', '✓'), "green")
+	updateViewHistory_LP()
+def LoadHistory(event):
+	global timmer_count_
+	global timer_readtime
+	try:
+		selection = view_history_LP.get(event.widget.curselection()[0])
+		print(selection)
+	except:
+		return ;
+	print(selection)
+	if True:
+		# "(state)%s 第%d章 第%d-%d節 @ %d+n"
+		data = selection[1::].replace('@ ', '').split(' ')[1::]
+		newbo, newch, newver, end_verse, sum_ = None, None, None, None, None
+		if len(data)==3:
+			newbo, newch, sum_ = data
+			newch = newch.replace('第', '').replace('章', '')
+			data = [newbo, newch]
+		if len(data)==4:
+			newbo, newch, newver, sum_ = data
+			newch = newch.replace('第', '').replace('章', '')
+			newver = newver.replace('第', '').replace('節', '')
+			data = [newbo, newch, newver]
+			if '-' in newver:
+				newver, end_verse = newver.split('-')
+				data = [newbo, newch, newver, end_verse]
+			print(newbo, newch, newver, end_verse, sum_)
+		
+		try:
+			history_script = BDR.getScriptContent('https://springbible.fhl.net/Bible2/cgic201/read201.cgi?na=0&chap='+str(sum_)+'&ver=big5&ft=0&temp=-1&tight=0', False)
+		except requests.exceptions.ConnectionError as e:
+			print("Error: Could not connect to the website.")
+			print("ConnectionError", e)
+			traceback.print_exc()
+			return ;
+		if global_debug_mode:
+			print(' --- START --- ', end='')
+			BDR.printScript(history_script[0], history_script[1])
+			print(' --- END --- ')
 
+		## final content
+		text_ = None
+		content_ = None
+		if len(data)==2:
+			text_ = '%s 第%s章'%(data[0], data[1])
+			content_ = history_script[1]
+		elif len(data)==3:
+			text_ = '%s 第%s章 第%s節 開始'%(data[0], data[1], data[2])
+			content_ = global_cur_script[1][int(newver)-1::]
+		elif len(data)==4:
+			text_ = '%s 第%s章 第%s到%s節'%(data[0], data[1], data[2], data[3])
+			content_ = global_cur_script[1][int(newver)-1:int(end_verse)]
+		else:
+			print('ERROR')
+		if BDR.int_RunTimer() - timmer_count_ > timer_readtime:
+			record_update('ADD', text_) ## record the searching result
+		else:
+			# if tkm.askyesno('[CHECK]', 'Have You Finished Reading This Chapter ?'):
+			# 	record_update('ADD', history_script[0]+' 第%d節'%int(newver)) ## record the searching result
+			# else:
+			record_update('COVER-LAST', text_) ## record the searching result
+		timmer_count_ = BDR.int_RunTimer()
+		displayScript(text_, content_)
+def UpdateHistory(mode, data):
+	global view_history
+	## gen new
+	state, detail = data ## detail = ['bookname', 'chapter_num', 'start_verse', 'end_verse']
+	curbo = detail[0] ## global__list_text1
+	curch = detail[1] ## global__list_text2
+	sum_ = 0
+	for bdr in BDR.list_:
+		if bdr.bookname==curbo:
+			break
+		else:
+			sum_ = sum_ + bdr.chapter
+	curver = detail[2] if len(detail)>2 else 1 ## global__list_text3
+	curver_end = detail[3] if len(detail)>3 else curver ## global__list_text4
+	_record_ = ''
+	# print(curbo, curch, curver, curver_end)
+	len_ = len(detail)
+	if len_==2:
+		_record_ = '▪️ ' + "%s 第%d章 @ %d" % (curbo, curch, sum_+curch)
+	elif len_==3:
+		_record_ = '▪️ ' + "%s 第%d章 第%d節 @ %d+%d" % (curbo, curch, curver, sum_+curch, curver)
+	elif len_==4:
+		_record_ = '▪️ ' + "%s 第%d章 第%d-%d節 @ %d+(%d-%d)" % (curbo, curch, curver, curver_end, sum_+curch, curver, curver_end-curver)
+	## clear old
+	# '✓' '✘' '✗' '▪️'
+	last_ = view_history[0][0] if len(view_history)>0 else None
+	print(last_)
+	if last_:
+		print(last_)
+		if ' '.join(_record_.split(' ')[1::])==' '.join(last_.split(' ')[1::]):
+			return ;
+		elif any(' '.join(_record_.split(' ')[1::])==' '.join(ll_[0].split(' ')[1::]) for ll_ in view_history):
+			return ;
+		else:
+			if mode=='ADD':
+				if '▪️' in last_:
+					last_ = last_.replace('▪️', '✓')
+				elif '✗' in last_:
+					last_ = last_.replace('✗', '✓')
+				# else:
+				# 	# view_history.append('')
+				# 	view_history = [None] + view_history
+			elif mode=='COVER-LAST':
+				if '▪️' in last_:
+					last_ = last_.replace('▪️', '✗')
+				else:
+					# view_history.append('')
+					view_history = [None] + view_history
+		# print(last_)
+		# view_history = view_history[0:-1]
+		view_history = view_history[1::]
+		# print((last_[0], 'green' if '✓' in last_ else 'red' if '✗' in last_ else 'black'))
+		# view_history.append((last_, 'green' if '✓' in last_ else 'red' if '✗' in last_ else 'black'))
+		view_history = [(last_, 'green' if '✓' in last_ else 'red' if '✗' in last_ else 'black')]+view_history
+		print(view_history)
+	print('view_history=', view_history)
+	if _record_!='':
+		view_history = [(_record_, 'black')] + view_history
+		updateViewHistory_LP()
 def record_update(mode, data):
 	global global_record_directory
 	# filename = str(datetime.today().strftime("%Y-%m-%d"))+'[][][].txt'
@@ -990,14 +1292,18 @@ def switch_script(cmd):
 		print(' --- END --- ')
 	if timmer_count_ == -707:
 		record_update('ADD', global_cur_script[0]) ## record the searching result
+		UpdateHistory('ADD', ['?']+[[global__list_text1, global__list_text2]]) ## record the searching result
 	else:
 		if BDR.int_RunTimer() - timmer_count_ > timer_readtime:
 			record_update('ADD', global_cur_script[0])
+			UpdateHistory('ADD', ['?']+[[global__list_text1, global__list_text2]])
 		else:
 			if tkm.askyesno('[CHECK]', 'Have You Finished Reading This Chapter ?'):
 				record_update('ADD', global_cur_script[0])
+				UpdateHistory('ADD', ['?']+[[global__list_text1, global__list_text2]])
 			else:
 				record_update('COVER-LAST', global_cur_script[0])
+				UpdateHistory('COVER-LAST', ['?']+[[global__list_text1, global__list_text2]])
 	timmer_count_ = BDR.int_RunTimer()
 	displayScript(global_cur_script[0]+'  '+tag, global_cur_script[1])
 	# except:
@@ -1026,6 +1332,7 @@ window.geometry("950x750")
 
 ## variables
 global_record_directory = 'ｒｅｃｏｒｄｓ\\'
+global_note_directory = '靈修存檔\\'
 # global_record_directory = 'records\\' ##'ｒｅｃｏｒｄｓ\\'
 global_is_editable = tk.BooleanVar()
 global_is_editable.set(False) ## init -- not editable
@@ -1144,9 +1451,32 @@ select_list1.grid(column=0, row=2, columnspan=2, sticky=align_mode)
 
 
 ## Searching Bar
-# initial_text = tk.StringVar(value='Input Text For Book Searching...')
-# book_search_text = tk.Entry(div1, textvariable=initial_text)
-# book_search_text.grid(row=0, column=0, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+def OnBookSearch(book_search_entry, searching_text_var, reason):
+	global bookname_choices
+	filtered_books = []
+	[print("Entry value changed:%r"%x) for x in searching_text_var.get()]
+	searching_text = searching_text_var.get()
+	if searching_text!='':
+		filtered_books = [book for book in bookname_choices if searching_text in book]
+	else:
+		filtered_books = bookname_choices
+	print('SEARCH REASULT:', filtered_books)
+	bookname__LP1.delete(0, "end")
+	for filtered_book in filtered_books:
+		bookname__LP1.insert("end", filtered_book)
+	if filtered_books:
+		book_search_entry.config(foreground="dark orange2", font=(default_font, MenuElement__fontsize_array[MenuElement__fontsize_array_index], "bold"))
+	else:
+		book_search_entry.config(foreground="red", font=(default_font, MenuElement__fontsize_array[MenuElement__fontsize_array_index], "normal"))
+## Create a custom style for the Entry widget
+style = tk.ttk.Style()
+style.configure("Better.TEntry", foreground="gray", font=("Helvetica", 12))
+## Main Assume
+# searching_text = tk.StringVar(value='Input Book Name...')
+searching_text = tk.StringVar(value='搜尋..')
+book_search_entry = tk.ttk.Entry(div1, style="Better.TEntry", textvariable=searching_text)
+book_search_entry.grid(row=0, column=0, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+searching_text.trace_add("write", lambda *args: OnBookSearch(book_search_entry, searching_text, "write"))
 
 # bookname_choices = [booknames_ch[index]+'    '+booknames_en[index] for index in range(len(booknames_ch))]
 bookname_choices = [name.bookname for name in BDR.list_]
@@ -1156,7 +1486,22 @@ global__chapter_num_choice = [-1]
 chapter_num__LP2 = tk.Listbox(div1, listvariable=tk.StringVar(value=global__chapter_num_choice), width=17)
 chapter_num__LP2.grid(row=1, column=1, rowspan=2, padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
 
+
 ## newly edit
+# '✓' '✘' '✗' '▪️'
+view_history = []
+view_history_LP = tk.Listbox(div2, listvariable=tk.StringVar(value=view_history), width=16)
+view_history_LP.grid(row=0, column=0, rowspan=2, padx=int(pad/2), pady=int(pad/2), sticky=tk.E+tk.W+tk.N+tk.S)
+## add new button with different function
+style = tk.ttk.Style()
+## Define a custom style
+style.configure("Square.TButton", font=("Arial", 14), width=4, height=5)
+Del_History_btn = tk.ttk.Button(div2, text="DEL", style="Square.TButton", command=Del_History)
+Del_History_btn.grid(row=0, column=1, ipadx=int(pad/2), padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+Finish_History_btn = tk.ttk.Button(div2, text="DONE", style="Square.TButton", command=Finish_History)
+Finish_History_btn.grid(row=1, column=1, ipadx=int(pad/2), padx=pad, pady=pad, sticky=tk.E+tk.W+tk.N+tk.S)
+
+
 # Create a Combobox widget
 # verse_num__Com3 = tk_combo.Combobox(div1, values=["Item 1", "Item 2", "Item 3", "Item 4", "Item 5"])
 global__verse_num_choice_S = [-1]
@@ -1277,7 +1622,10 @@ checkbox1['command'] = lambda: TextBoxStatusChanging(global_is_editable)
 # listbox1.bind('<<ListboxSelect>>', lambda event: ChapterSelection1(1, event.widget.get(event.widget.curselection())))
 # listbox2.bind('<<ListboxSelect>>', lambda event: ChapterSelection2(2, event.widget.get(event.widget.curselection())))
 bookname__LP1.bind("<<ListboxSelect>>", List1_Select)
-chapter_num__LP2.bind("<<ListboxSelect>>", List2_Select)
+# chapter_num__LP2.bind("<<ListboxSelect>>", List2_Select)
+chapter_num__LP2.bind("<ButtonRelease-1>", List2_Select)
+# view_history_LP.bind("<<ListboxSelect>>", LoadHistory)
+view_history_LP.bind("<ButtonRelease-1>", LoadHistory)
 
 ## newly edit
 # Bind the selection event to the on_item_selected function
