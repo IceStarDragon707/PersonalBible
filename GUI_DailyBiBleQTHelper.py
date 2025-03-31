@@ -200,6 +200,8 @@ def UpdateNoteStyle(NoteContent_Text, id_):
 		str__ChangeFont(NoteContent_Text, subwindow2_font, id_)
 		str__ChangeFontSize(NoteContent_Text, Note__fontsize_array, subwindow2_fontsize_index, Note__fontsize_array[subwindow2_fontsize_index])
 def NoteContent__NewPage(NoteContent_Text, id_, mode):
+	global global_saving_pos
+	global_saving_pos = None
 	flag = NoteContent_Text.get("1.0", tk.END)=='\n'
 	# print(flag)
 	# [print('%r'%c) for c in NoteContent_Text.get("1.0", tk.END)]
@@ -220,6 +222,7 @@ def NoteContent__NewPage(NoteContent_Text, id_, mode):
 			3.將憂慮卸給神，求神賜恩典，列下信心不堅固的原因，神召我得永遠的榮耀。
 		應用
 			我不必為我的籌款不足和身體狀況憂慮，我可以禱告並信靠天父，，因祢愛我顧念我，我不要被不好的經驗影響，我要相信祢的呼召和應許。
+
 範例 II：
 	III_ADVANCED
 		i.學習找出自己的疑問與好奇
@@ -248,6 +251,9 @@ def NoteContent__NewPage(NoteContent_Text, id_, mode):
 				(個人)(具體)(有回應)
 
 		'''
+		seg3 = f'''
+範例 III(格式說明)：
+		'''
 		data_format = f'''
 	(取自'經文')
 		觀察
@@ -268,28 +274,35 @@ def NoteContent__NewPage(NoteContent_Text, id_, mode):
 		iii.屬靈扎根( 神的心意):(人 神對比)
 		iiii.驗證:(提出法則/驗證法則)
 		'''
-		data = '' if mode=='Empty' else '格式：'+data_format if mode=='New' else data_exmaples+'範例 III(格式說明)：'+data_format if 'Examples' else 'IMPOSSIBLE'
+		data = '' if mode=='Empty' else '格式：'+data_format if mode=='New' else data_exmaples+seg3+data_format if 'Examples' else 'IMPOSSIBLE'
 		NoteContent_Text.insert(tk.INSERT, data)
 		UpdateNoteStyle(NoteContent_Text, id_)
 		flash_sub_window(sub_window1 if id_==1 else sub_window2, 0)
+global_saving_pos = None
 def NoteContent__SaveContent(NoteContent_Text, id_):
 	import subprocess
 	global global_note_directory
 	global sub_window1
 	global sub_window2
+	global global_saving_pos
 	text_content = NoteContent_Text.get("1.0", tk.END)
 	file_name = str(datetime.today().strftime("%Y-%m-%d"))+'__'+('歸納式查經' if id_==2 else '靈修筆記' if id_==1 else '')+'.txt'
 	if text_content!='':
-		file_path = filedialog.asksaveasfilename(
-			defaultextension=".txt",
-			filetypes=[("Text files", "*.txt")],
-			initialfile=file_name,
-			initialdir=global_note_directory
-			# initialfile="custom_file_name.txt",  # Customize default filename
-			# initialdir="C:/Users/YourUsername/Documents"  # Set initial directory
-		)
+		file_path = ''
+		if not global_saving_pos:
+			file_path = filedialog.asksaveasfilename(
+				defaultextension=".txt",
+				filetypes=[("Text files", "*.txt")],
+				initialfile=file_name,
+				initialdir=global_note_directory
+				# initialfile="custom_file_name.txt",  # Customize default filename
+				# initialdir="C:/Users/YourUsername/Documents"  # Set initial directory
+			)
+			global_saving_pos = file_path
+		else:
+			file_path = global_saving_pos
 		if file_path:
-			with open(file_path, "w") as file:
+			with open(file_path, "w", encoding='utf-8') as file:
 				file.write(text_content)
 			if tkm.askyesno('[注意]', '此檔案(%s)將存在(%r)。是否開啟位置。'%(file_name, global_note_directory)):
 				# os.system()
