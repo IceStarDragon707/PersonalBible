@@ -19,7 +19,7 @@ from tkinter import filedialog
 
 class Theme:
 	colors = [] ## different color including: 'BibleContent', 'BibleTitle', 'div', 'button', ...
-	def __init__(color_panel):
+	def __init__(self, color_panel):
 		self.colors = color_panel
 
 
