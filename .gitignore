@@ -5,3 +5,7 @@ __pycache__
 ｒｅｃｏｒｄｓ/
 git_record.txt
 靈修存檔/
+
+venv/
+
+.idea/
